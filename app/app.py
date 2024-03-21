@@ -67,7 +67,7 @@ async def check_credit(id: int):
 async def add_credit(ctx, target: discord.user.User, credit: int, reason: str = ""):
 
     if ctx.user.id not in admins:
-        await ctx.respond("YOU DO NOT HAVE THE RIGHTS TO DO THIS")
+        await ctx.respond("YOU DO NOT HAVE THE RIGHTS TO DO THIS. STRAIGHT TO THE RE-EDUCATION CAMP WITH YOU")
         return
 
     curUser = await insert_credit(target.id, target.name, credit, reason)
@@ -75,7 +75,7 @@ async def add_credit(ctx, target: discord.user.User, credit: int, reason: str = 
     if credit > 0:
         embed = discord.Embed(
             title="SOCIAL CREDITS",
-            description=f"`{curUser.name.upper()}` HAS BEEN AWARDED WITH `{credit}` SOCIAL CREDITS. THEY NOW HAVE `{curUser.credit}` CREDITS",
+            description=f"`{curUser.name.upper()}` HAS BEEN AWARDED WITH `{credit}` SOCIAL CREDITS. THEY NOW HAVE `{curUser.credit}` CREDITS. {reason}",
             colour=discord.Colour.green(),
             thumbnail=target.display_avatar.url
         )
@@ -83,7 +83,7 @@ async def add_credit(ctx, target: discord.user.User, credit: int, reason: str = 
     else:
         embed = discord.Embed(
             title="SOCIAL CREDITS",
-            description=f"`{curUser.name.upper()}` HAS LOST `{credit}` SOCIAL CREDITS. THEY NOW HAVE `{curUser.credit}` CREDITS",
+            description=f"`{curUser.name.upper()}` HAS LOST `{credit}` SOCIAL CREDITS. THEY NOW HAVE `{curUser.credit}` CREDITS. {reason}",
             colour=discord.Colour.dark_red(),
             thumbnail=target.display_avatar.url
         )
@@ -126,6 +126,7 @@ async def leaderboard(ctx, order: discord.Option(choices=['high', 'low']) = 'hig
         order = 'DESC'
     else:
         order = 'ASC'
+
     async with aiosqlite.connect("/var/data/db.sqlite") as db:
         async with db.execute(f"SELECT * FROM user ORDER BY credit {order}") as cursor:
             async for row in cursor:
