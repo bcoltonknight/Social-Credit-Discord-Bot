@@ -61,8 +61,8 @@ async def check_credit(id: int):
 # async def guilds(ctx):
 #     await ctx.respond(f"{bot.guilds}")
 
-
-@bot.slash_command(name="credit", description="Give target user social credits", guild_ids=ids)
+# , guild_ids=ids
+@bot.slash_command(name="credit", description="Give target user social credits")
 # pycord will figure out the types for you
 async def add_credit(ctx, target: discord.user.User, credit: int, reason: str = ""):
 
@@ -91,7 +91,7 @@ async def add_credit(ctx, target: discord.user.User, credit: int, reason: str = 
     await ctx.respond(embed=embed)
 
 
-@bot.slash_command(name="balance", description="Get the balance of the target user", guild_ids=ids)
+@bot.slash_command(name="balance", description="Get the balance of the target user")
 # pycord will figure out the types for you
 async def check_balance(ctx, target: discord.user.User):
     curUser = await check_credit(target.id)
@@ -112,7 +112,7 @@ async def check_balance(ctx, target: discord.user.User):
     await ctx.respond(embed=embed)
 
 
-@bot.slash_command(name="leaderboard", description="Get a leaderboard of users with the highest social credit", guild_ids=ids)
+@bot.slash_command(name="leaderboard", description="Get a leaderboard of users with the highest social credit")
 # pycord will figure out the types for you
 async def leaderboard(ctx, order: discord.Option(choices=['high', 'low']) = 'high'):
     num = 1
@@ -137,7 +137,7 @@ async def leaderboard(ctx, order: discord.Option(choices=['high', 'low']) = 'hig
     await ctx.respond(embed=embed)
 
 
-@bot.slash_command(name="history", description="Get a history of a users social credit", guild_ids=ids)
+@bot.slash_command(name="history", description="Get a history of a users social credit")
 # pycord will figure out the types for you
 async def history(ctx, target: discord.user.User):
     num = 1
