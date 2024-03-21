@@ -5,6 +5,8 @@ services:
     restart: always
     volumes:
       - db:/var/data  
+    environment: 
+      TOKEN: ${TOKEN}
 
 volumes:
   db:
