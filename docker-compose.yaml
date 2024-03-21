@@ -4,4 +4,7 @@ services:
       context: ./
     restart: always
     volumes:
-      - ./data:/var/data  
+      - db:/var/data  
+
+volumes:
+  db:
