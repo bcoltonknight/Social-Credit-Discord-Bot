@@ -2,6 +2,7 @@ services:
   xi: 
     build:
       context: ./
+    pull_policy: build
     restart: always
     volumes:
       - db:/var/data  
