@@ -5,5 +5,3 @@ services:
     restart: always
     volumes:
       - ./data:/var/data  
-    environment: 
-      - TOKEN=<TOKEN HERE>
