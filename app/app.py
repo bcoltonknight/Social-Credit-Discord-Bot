@@ -22,14 +22,14 @@ class user:
 
 
 async def init():
-    async with aiosqlite.connect("db.sqlite") as db:
+    async with aiosqlite.connect("/var/data/db.sqlite") as db:
         await db.execute("CREATE TABLE IF NOT EXISTS user (id INTEGER PRIMARY KEY, username TEXT, credit INTEGER)")
         await db.execute("CREATE TABLE IF NOT EXISTS history (id INTEGER PRIMARY KEY, user INTEGER, amount INTEGER, reason TEXT, timestamp TEXT)")
         await db.commit()
 
 
 async def insert_credit(id: int, username: str, credit: int, reason: str):
-    async with aiosqlite.connect("db.sqlite") as db:
+    async with aiosqlite.connect("/var/data/db.sqlite") as db:
       async with db.execute("SELECT * FROM user where id = ?", (id,)) as cursor:
         row = await cursor.fetchone()
         if row:
@@ -46,7 +46,7 @@ async def insert_credit(id: int, username: str, credit: int, reason: str):
 
 
 async def check_credit(id: int):
-    async with aiosqlite.connect("db.sqlite") as db:
+    async with aiosqlite.connect("/var/data/db.sqlite") as db:
       async with db.execute("SELECT * FROM user where id = ?", (id,)) as cursor:
         row = await cursor.fetchone()
         if row:
@@ -126,7 +126,7 @@ async def leaderboard(ctx, order: discord.Option(choices=['high', 'low']) = 'hig
         order = 'DESC'
     else:
         order = 'ASC'
-    async with aiosqlite.connect("db.sqlite") as db:
+    async with aiosqlite.connect("/var/data/db.sqlite") as db:
         async with db.execute(f"SELECT * FROM user ORDER BY credit {order}") as cursor:
             async for row in cursor:
                 if row[0] in members:
@@ -147,7 +147,7 @@ async def history(ctx, target: discord.user.User):
         thumbnail=target.display_avatar.url
     )
 
-    async with aiosqlite.connect("db.sqlite") as db:
+    async with aiosqlite.connect("/var/data/db.sqlite") as db:
         async with db.execute(f"SELECT * FROM history WHERE user = ? ORDER BY id DESC", (target.id,)) as cursor:
             async for row in cursor:
                 embed.add_field(name=f"{row[4]} ", value=f"{row[2]} | {row[3]}", inline=False)
@@ -155,5 +155,7 @@ async def history(ctx, target: discord.user.User):
     await ctx.respond(embed=embed)
 
 asyncio.run(init())
-bot.run(str(os.getenv("TOKEN")))
+token = str(os.getenv("TOKEN"))
+print(token)
+bot.run(token)
 

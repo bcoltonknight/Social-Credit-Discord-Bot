@@ -1,0 +1,9 @@
+services: 
+  xi: 
+    build:
+      context: ./
+    restart: always
+    volumes:
+      - ./data:/var/data  
+    environment: 
+      - TOKEN=<TOKEN HERE>
