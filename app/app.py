@@ -4,6 +4,7 @@ import discord
 import aiosqlite
 import os
 from datetime import datetime
+DB_PATH = '/var/data/db.sqlite'
 
 intents = discord.Intents.default()
 intents.members = True
@@ -22,14 +23,14 @@ class user:
 
 
 async def init():
-    async with aiosqlite.connect("/var/data/db.sqlite") as db:
+    async with aiosqlite.connect(DB_PATH) as db:
         await db.execute("CREATE TABLE IF NOT EXISTS user (id INTEGER PRIMARY KEY, username TEXT, credit INTEGER)")
         await db.execute("CREATE TABLE IF NOT EXISTS history (id INTEGER PRIMARY KEY, user INTEGER, amount INTEGER, reason TEXT, timestamp TEXT)")
         await db.commit()
 
 
 async def insert_credit(id: int, username: str, credit: int, reason: str):
-    async with aiosqlite.connect("/var/data/db.sqlite") as db:
+    async with aiosqlite.connect(DB_PATH) as db:
       async with db.execute("SELECT * FROM user where id = ?", (id,)) as cursor:
         row = await cursor.fetchone()
         if row:
@@ -46,7 +47,7 @@ async def insert_credit(id: int, username: str, credit: int, reason: str):
 
 
 async def check_credit(id: int):
-    async with aiosqlite.connect("/var/data/db.sqlite") as db:
+    async with aiosqlite.connect(DB_PATH) as db:
       async with db.execute("SELECT * FROM user where id = ?", (id,)) as cursor:
         row = await cursor.fetchone()
         if row:
@@ -56,7 +57,7 @@ async def check_credit(id: int):
 
 
 async def get_credit(id: int):
-    async with aiosqlite.connect("/var/data/db.sqlite") as db:
+    async with aiosqlite.connect(DB_PATH) as db:
       async with db.execute("SELECT * FROM user where id = ?", (id,)) as cursor:
         row = await cursor.fetchone()
         if row:
@@ -138,7 +139,7 @@ async def leaderboard(ctx, order: discord.Option(choices=['high', 'low']) = 'hig
     else:
         order = 'ASC'
 
-    async with aiosqlite.connect("/var/data/db.sqlite") as db:
+    async with aiosqlite.connect(DB_PATH) as db:
         async with db.execute(f"SELECT * FROM user ORDER BY credit {order}") as cursor:
             async for row in cursor:
                 if row[0] in members:
@@ -159,7 +160,7 @@ async def history(ctx, target: discord.user.User):
         thumbnail=target.display_avatar.url
     )
 
-    async with aiosqlite.connect("/var/data/db.sqlite") as db:
+    async with aiosqlite.connect(DB_PATH) as db:
         async with db.execute(f"SELECT * FROM history WHERE user = ? ORDER BY id DESC", (target.id,)) as cursor:
             async for row in cursor:
                 embed.add_field(name=f"{row[4]} ", value=f"{row[2]} | {row[3]}", inline=False)
@@ -167,12 +168,12 @@ async def history(ctx, target: discord.user.User):
     await ctx.respond(embed=embed)
 
 
-@bot.slash_command(name="remove", description="Spend your own credits to remove someone else's credits at a ratio of 2/1", guild_ids=ids)
+@bot.slash_command(name="remove", description="Spend your own credits to remove someone else's credits at a ratio of 2/1")
 # pycord will figure out the types for you
 async def remove(ctx, target: discord.user.User, amount: int):
     remover = ctx.user.id
-    removerCredit = get_credit(remover)
-    if removerCredit <= 0:
+    removerCredit = await get_credit(remover)
+    if not removerCredit or removerCredit <= 0:
         embed = discord.Embed(
             title="YOU ARE TOO POOR",
             color=discord.Colour.red(),
