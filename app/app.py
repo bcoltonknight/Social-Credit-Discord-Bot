@@ -181,8 +181,8 @@ async def remove(ctx, target: discord.user.User, amount: int):
         )
     else:
         newCredit = int(amount/2)
-        insert_credit(ctx.user.id, ctx.user.name, -amount, f"Spent to remove credits from {target.name}")
-        insert_credit(target.id, target.name, -newCredit, f"Credits removed by {ctx.user.name}")
+        await insert_credit(ctx.user.id, ctx.user.name, -amount, f"Spent to remove credits from {target.name}")
+        await insert_credit(target.id, target.name, -newCredit, f"Credits removed by {ctx.user.name}")
         embed = discord.Embed(
             title="SOCIAL CREDITS REMOVED",
             description=f"{ctx.user.name} had {newCredit} removed from {target.name}",
