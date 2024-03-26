@@ -64,7 +64,7 @@ async def check_credit(id: int):
 # , guild_ids=ids
 @bot.slash_command(name="credit", description="Give target user social credits")
 # pycord will figure out the types for you
-async def add_credit(ctx, target: discord.user.User, credit: int, reason: str = ""):
+async def add_credit(ctx, target: discord.user.User, credit: int, reason: str):
 
     if ctx.user.id not in admins:
         await ctx.respond("YOU DO NOT HAVE THE RIGHTS TO DO THIS. STRAIGHT TO THE RE-EDUCATION CAMP WITH YOU")
@@ -75,7 +75,7 @@ async def add_credit(ctx, target: discord.user.User, credit: int, reason: str = 
     if credit > 0:
         embed = discord.Embed(
             title="SOCIAL CREDITS",
-            description=f"`{curUser.name.upper()}` HAS BEEN AWARDED WITH `{credit}` SOCIAL CREDITS. THEY NOW HAVE `{curUser.credit}` CREDITS. {reason}",
+            description=f"`{curUser.name.upper()}` HAS BEEN AWARDED WITH `{credit}` SOCIAL CREDITS. THEY NOW HAVE `{curUser.credit}` CREDITS. ",
             colour=discord.Colour.green(),
             thumbnail=target.display_avatar.url
         )
@@ -83,11 +83,12 @@ async def add_credit(ctx, target: discord.user.User, credit: int, reason: str = 
     else:
         embed = discord.Embed(
             title="SOCIAL CREDITS",
-            description=f"`{curUser.name.upper()}` HAS LOST `{credit}` SOCIAL CREDITS. THEY NOW HAVE `{curUser.credit}` CREDITS. {reason}",
+            description=f"`{curUser.name.upper()}` HAS LOST `{credit}` SOCIAL CREDITS. THEY NOW HAVE `{curUser.credit}` CREDITS.",
             colour=discord.Colour.dark_red(),
             thumbnail=target.display_avatar.url
         )
 
+    embed.add_field(name='Reason', value=reason)
     await ctx.respond(embed=embed)
 
 
