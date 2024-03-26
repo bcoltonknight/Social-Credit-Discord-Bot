@@ -173,7 +173,7 @@ async def history(ctx, target: discord.user.User):
 async def remove(ctx, target: discord.user.User, amount: int):
     remover = ctx.user.id
     removerCredit = await get_credit(remover)
-    if not removerCredit or removerCredit <= 0:
+    if not removerCredit or removerCredit - amount<= 0:
         embed = discord.Embed(
             title="YOU ARE TOO POOR",
             color=discord.Colour.red(),
@@ -185,10 +185,40 @@ async def remove(ctx, target: discord.user.User, amount: int):
         await insert_credit(target.id, target.name, -newCredit, f"Credits removed by {ctx.user.name}")
         embed = discord.Embed(
             title="SOCIAL CREDITS REMOVED",
-            description=f"{ctx.user.name} had {newCredit} removed from {target.name}",
+            description=f"{ctx.user.name} spent {amount} to have {newCredit} credits removed from {target.name}",
             color=discord.Colour.red(),
             thumbnail=target.display_avatar.url
         )
+    await ctx.respond(embed=embed)
+
+
+@bot.slash_command(name="give", description="Transfer an amount of credits to another user")
+# pycord will figure out the types for you
+async def give(ctx, target: discord.user.User, amount: int):
+    giver = ctx.user.id
+    giverCredit = await get_credit(giver)
+    if not giverCredit or giverCredit - amount <= 0:
+        embed = discord.Embed(
+            title="YOU ARE TOO POOR",
+            color=discord.Colour.red(),
+            thumbnail=ctx.user.display_avatar.url
+        )
+    else:
+        if amount < 0:
+            embed = discord.Embed(
+            title="You cannot give negative credits",
+            color=discord.Colour.red(),
+            thumbnail=ctx.user.display_avatar.url
+        )
+        else:
+            await insert_credit(ctx.user.id, ctx.user.name, -amount, f"Transfered credits to {target.name}")
+            await insert_credit(target.id, target.name, amount, f"Received a transfer from {ctx.user.name}")
+            embed = discord.Embed(
+                title="SOCIAL CREDITS TRANSFERED",
+                description=f"{ctx.user.name} has sent {amount} credits to {target.name}",
+                color=discord.Colour.blurple(),
+                thumbnail=target.display_avatar.url
+            )
     await ctx.respond(embed=embed)
 
 
