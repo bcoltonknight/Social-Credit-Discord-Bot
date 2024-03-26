@@ -55,6 +55,16 @@ async def check_credit(id: int):
             return None
 
 
+async def get_credit(id: int):
+    async with aiosqlite.connect("/var/data/db.sqlite") as db:
+      async with db.execute("SELECT * FROM user where id = ?", (id,)) as cursor:
+        row = await cursor.fetchone()
+        if row:
+            return row[2]
+        else:
+            return None
+
+
 
 # @bot.slash_command(name="guilds", guild_ids=[763897284730814524])
 # # pycord will figure out the types for you
@@ -155,6 +165,31 @@ async def history(ctx, target: discord.user.User):
                 embed.add_field(name=f"{row[4]} ", value=f"{row[2]} | {row[3]}", inline=False)
                 num += 1
     await ctx.respond(embed=embed)
+
+
+@bot.slash_command(name="remove", description="Spend your own credits to remove someone else's credits at a ratio of 2/1", guild_ids=ids)
+# pycord will figure out the types for you
+async def remove(ctx, target: discord.user.User, amount: int):
+    remover = ctx.user.id
+    removerCredit = get_credit(remover)
+    if removerCredit <= 0:
+        embed = discord.Embed(
+            title="YOU ARE TOO POOR",
+            color=discord.Colour.red(),
+            thumbnail=ctx.user.display_avatar.url
+        )
+    else:
+        newCredit = int(amount/2)
+        insert_credit(ctx.user.id, ctx.user.name, -amount, f"Spent to remove credits from {target.name}")
+        insert_credit(target.id, target.name, -newCredit, f"Credits removed by {ctx.user.name}")
+        embed = discord.Embed(
+            title="SOCIAL CREDITS REMOVED",
+            description=f"{ctx.user.name} had {newCredit} removed from {target.name}",
+            color=discord.Colour.red(),
+            thumbnail=target.display_avatar.url
+        )
+    await ctx.respond(embed=embed)
+
 
 asyncio.run(init())
 token = str(os.getenv("TOKEN"))
