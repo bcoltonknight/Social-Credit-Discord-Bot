@@ -3,15 +3,22 @@ import dotenv
 import discord
 import aiosqlite
 import os
+import logging
 from datetime import datetime
 DB_PATH = '/var/data/db.sqlite'
+
+logging.basicConfig(level=logging.INFO)
+
+logging.basicConfig(level=logging.INFO,
+                    format='%(asctime)s - %(levelname)s - %(name)s - %(message)s',
+                    datefmt='%Y-%m-%d %H:%M:%S')
+logger = logging.getLogger(__name__)
 
 intents = discord.Intents.default()
 intents.members = True
 dotenv.load_dotenv()
 bot = discord.Bot(intents=intents)
 admins = os.getenv("BOT_ADMINS").split(',')
-print(admins)
 # we need to limit the guilds for testing purposes
 # so other users wouldn't see the command that we're testing
 ids = os.getenv("GUILD_IDS").split(',')
@@ -77,8 +84,6 @@ async def get_credit(id: int):
 @bot.slash_command(name="credit", description="Give target user social credits")
 # pycord will figure out the types for you
 async def add_credit(ctx, target: discord.user.User, credit: int, reason: str):
-    print(admins)
-    print(str(ctx.user.id))
     if str(ctx.user.id) not in admins:
         await ctx.respond("YOU DO NOT HAVE THE RIGHTS TO DO THIS. STRAIGHT TO THE RE-EDUCATION CAMP WITH YOU")
         return
