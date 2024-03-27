@@ -11,11 +11,9 @@ intents.members = True
 dotenv.load_dotenv()
 bot = discord.Bot(intents=intents)
 admins = os.getenv("BOT_ADMINS").split(',')
-admins = [int(admin) for admin in admins]
 # we need to limit the guilds for testing purposes
 # so other users wouldn't see the command that we're testing
 ids = os.getenv("GUILD_IDS").split(',')
-ids = [int(id) for id in ids]
 
 class user:
     def __init__(self, id, name, credit):
@@ -78,7 +76,7 @@ async def get_credit(id: int):
 @bot.slash_command(name="credit", description="Give target user social credits")
 # pycord will figure out the types for you
 async def add_credit(ctx, target: discord.user.User, credit: int, reason: str):
-    if ctx.user.id not in admins:
+    if str(ctx.user.id) not in admins:
         await ctx.respond("YOU DO NOT HAVE THE RIGHTS TO DO THIS. STRAIGHT TO THE RE-EDUCATION CAMP WITH YOU")
         return
 
