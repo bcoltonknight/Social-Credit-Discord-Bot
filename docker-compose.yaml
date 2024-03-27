@@ -8,6 +8,7 @@ services:
       - db:/var/data  
     environment: 
       TOKEN: ${TOKEN}
-
+      GUILD_IDS: ${GUILD_IDS} 
+      BOT_ADMINS: ${BOT_ADMINS} 
 volumes:
   db:

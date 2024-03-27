@@ -10,10 +10,12 @@ intents = discord.Intents.default()
 intents.members = True
 dotenv.load_dotenv()
 bot = discord.Bot(intents=intents)
-admins = [273131410494062593, 325061535162564609, 319796579538173953, 341419086321942530, 492411292179759126, 270424018736250880, 271850427602042880, 1010638766035181579]
+admins = os.getenv("BOT_ADMINS").split(',')
+admins = [int(admin) for admin in admins]
 # we need to limit the guilds for testing purposes
 # so other users wouldn't see the command that we're testing
-ids = [763897284730814524, 961864858813468752, 688181537900068869]
+ids = os.getenv("GUILD_IDS").split(',')
+ids = [int(id) for id in ids]
 
 class user:
     def __init__(self, id, name, credit):
@@ -76,7 +78,6 @@ async def get_credit(id: int):
 @bot.slash_command(name="credit", description="Give target user social credits")
 # pycord will figure out the types for you
 async def add_credit(ctx, target: discord.user.User, credit: int, reason: str):
-
     if ctx.user.id not in admins:
         await ctx.respond("YOU DO NOT HAVE THE RIGHTS TO DO THIS. STRAIGHT TO THE RE-EDUCATION CAMP WITH YOU")
         return
@@ -224,6 +225,5 @@ async def give(ctx, target: discord.user.User, amount: int):
 
 asyncio.run(init())
 token = str(os.getenv("TOKEN"))
-print(token)
 bot.run(token)
 
