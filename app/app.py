@@ -34,6 +34,7 @@ async def init():
     async with aiosqlite.connect(DB_PATH) as db:
         await db.execute("CREATE TABLE IF NOT EXISTS user (id INTEGER PRIMARY KEY, username TEXT, credit INTEGER)")
         await db.execute("CREATE TABLE IF NOT EXISTS history (id INTEGER PRIMARY KEY, user INTEGER, amount INTEGER, reason TEXT, timestamp TEXT)")
+        await db.execute("CREATE TABLE IF NOT EXISTS rads (id INTEGER PRIMARY KEY, user INTEGER, score INTEGER)")
         await db.commit()
 
 
@@ -226,6 +227,50 @@ async def give(ctx, target: discord.user.User, amount: int):
                 color=discord.Colour.blurple(),
                 thumbnail=target.display_avatar.url
             )
+    await ctx.respond(embed=embed)
+
+
+@bot.slash_command(name="setrads", description="Set the rads test score of target user")
+# pycord will figure out the types for you
+async def set_rads(ctx, target: discord.user.User, score: int):
+    embed = discord.Embed(
+        title="RADS SCORE SET",
+        color=discord.Colour.blurple(),
+        thumbnail=target.display_avatar.url,
+        description=f"{target.name} was assigned a RADS score of {score}"
+    )
+
+    async with aiosqlite.connect(DB_PATH) as db:
+        async with db.execute(f"SELECT * FROM rads WHERE user = ?", (target.id,)) as cursor:
+            row = await cursor.fetchone()
+            if row:
+                await db.execute("UPDATE rads SET score = ? where user = ?", (score, target.id,))
+                db.commit()
+            else:
+                await db.execute("INSERT INTO rads (user, score) VALUES (?, ?) ", (score, target.id,))
+
+    await ctx.respond(embed=embed)
+
+
+@bot.slash_command(name="getrads", description="Get the rads test score of target user")
+# pycord will figure out the types for you
+async def get_rads(ctx, target: discord.user.User):
+    
+
+    async with aiosqlite.connect(DB_PATH) as db:
+        async with db.execute(f"SELECT * FROM rads WHERE user = ?", (target.id,)) as cursor:
+            row = await cursor.fetchone()
+            if row:
+                score = row[2]
+            else:
+                score = 'UNSET'
+
+    embed = discord.Embed(
+        title="RADS SCORE",
+        color=discord.Colour.blurple(),
+        thumbnail=target.display_avatar.url,
+        description=f"{target.name} has a RADS score of {score}"
+    )
     await ctx.respond(embed=embed)
 
 
