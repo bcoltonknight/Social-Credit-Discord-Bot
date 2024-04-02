@@ -291,7 +291,7 @@ async def rads_board(ctx, order: discord.Option(choices=['high', 'low']) = 'high
         order = 'ASC'
 
     async with aiosqlite.connect(DB_PATH) as db:
-        async with db.execute(f"SELECT * FROM rads ORDER BY credit {order}") as cursor:
+        async with db.execute(f"SELECT * FROM rads ORDER BY score {order}") as cursor:
             async for row in cursor:
                 if row[0] in members:
                     embed.add_field(name=f"{num}. ", value=f"{row[1]} | {row[2]}", inline=False)
