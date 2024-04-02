@@ -247,7 +247,7 @@ async def set_rads(ctx, target: discord.user.User, score: int):
                 await db.execute("UPDATE rads SET score = ? where user = ?", (score, target.id,))
                 db.commit()
             else:
-                await db.execute("INSERT INTO rads (user, score) VALUES (?, ?) ", (score, target.id,))
+                await db.execute("INSERT INTO rads (user, score) VALUES (?, ?) ", (target.id, score))
 
     await ctx.respond(embed=embed)
 
