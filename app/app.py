@@ -295,9 +295,7 @@ async def rads_board(ctx, order: discord.Option(choices=['high', 'low']) = 'high
         async with db.execute(f"SELECT * FROM rads ORDER BY score {order}") as cursor:
             async for row in cursor:
                 if row[1] in members:
-                    logger.info(row[1])
-                    user = await check_credit(row[1])
-                    logger.info(user)
+                    user = discord.fetch_user(row[1])
                     embed.add_field(name=f"{num}. ", value=f"{user.name} | {row[2]}", inline=False)
                     num += 1
 
