@@ -233,6 +233,15 @@ async def give(ctx, target: discord.user.User, amount: int):
 @bot.slash_command(name="setrads", description="Set the rads test score of target user")
 # pycord will figure out the types for you
 async def set_rads(ctx, target: discord.user.User, score: int):
+    if str(ctx.user.id) not in admins and ctx.user.id != target.id:
+        embed = embed = discord.Embed(
+            title="YOU ARE NOT ALLOWED TO ASSIGN THIS AUTISM SCORE",
+            color=discord.Colour.red(),
+            thumbnail=ctx.user.display_avatar.url,
+        )
+        await ctx.respond(embed=embed)
+        return 
+    
     embed = discord.Embed(
         title="RADS SCORE SET",
         color=discord.Colour.blurple(),
