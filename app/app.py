@@ -274,6 +274,32 @@ async def get_rads(ctx, target: discord.user.User):
     await ctx.respond(embed=embed)
 
 
+
+@bot.slash_command(name="radsboard", description="Get a leaderboard of users with the highest RADS score")
+# pycord will figure out the types for you
+async def rads_board(ctx, order: discord.Option(choices=['high', 'low']) = 'high'):
+    num = 1
+    members = [member.id for member in ctx.guild.members]
+    embed = discord.Embed(
+        title="RADS-R LEADERBOARD",
+        color=discord.Colour.blurple(),
+    )
+
+    if order == 'high':
+        order = 'DESC'
+    else:
+        order = 'ASC'
+
+    async with aiosqlite.connect(DB_PATH) as db:
+        async with db.execute(f"SELECT * FROM rads ORDER BY credit {order}") as cursor:
+            async for row in cursor:
+                if row[0] in members:
+                    embed.add_field(name=f"{num}. ", value=f"{row[1]} | {row[2]}", inline=False)
+                    num += 1
+
+    await ctx.respond(embed=embed)
+
+
 asyncio.run(init())
 token = str(os.getenv("TOKEN"))
 bot.run(token)
